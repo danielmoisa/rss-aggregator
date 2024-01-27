@@ -61,6 +61,8 @@ func main() {
 	v1Router := chi.NewRouter()
 	v1Router.Get("/health", handlers.HandlerReadiness)
 	v1Router.Post("/users", apiConfig.CreateUser)
+	v1Router.Get("/users", apiConfig.GetUserByApiKey)
+
 	router.Mount("/v1", v1Router)
 
 	// Start server
