@@ -1,15 +1,18 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/danielmoisa/rss-aggregator/internal/database"
 	"github.com/danielmoisa/rss-aggregator/internal/handlers"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -20,7 +23,23 @@ func main() {
 		log.Fatal("Port not configured in the env")
 	}
 
+	dbUrl := os.Getenv("DB_URL")
+	if dbUrl == "" {
+		log.Fatal("Database url not configured in the env")
+	}
+
+	conn, err := sql.Open("postgres", dbUrl)
+	if err != nil {
+		log.Fatal("Can't connect to database")
+	}
+
+	apiConfig := handlers.ApiConfig{
+		DB: database.New(conn),
+	}
+
 	router := chi.NewRouter()
+
+	// Cors
 	router.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
 		AllowedOrigins: []string{"https://*", "http://*"},
@@ -32,18 +51,21 @@ func main() {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
+	// Init server
 	server := &http.Server{
 		Handler: router,
 		Addr:    ":" + port,
 	}
 
+	// Api routes
 	v1Router := chi.NewRouter()
 	v1Router.Get("/health", handlers.HandlerReadiness)
-
+	v1Router.Post("/users", apiConfig.CreateUser)
 	router.Mount("/v1", v1Router)
 
+	// Start server
 	fmt.Printf("Server listen on http://localhost:%v\n", port)
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}

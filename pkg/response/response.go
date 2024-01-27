@@ -20,7 +20,7 @@ func ResponseWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(data)
 }
 
-func ResponseWithErrors(w http.ResponseWriter, code int, msg string) {
+func ResponseWithError(w http.ResponseWriter, code int, msg string) {
 	if code >= 500 {
 		log.Println("Responding with 5xx error:", msg)
 	}

@@ -6,3 +6,6 @@ migrate-up:
 
 migrate-down:
 	cd migrations/schema && goose postgres postgres://postgres:pass@localhost:5432/rssagg down
+
+gen:
+	sqlc generate
