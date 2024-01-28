@@ -1,4 +1,4 @@
-package auth
+package api
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ const API_KEY = "ApiKey"
 
 // Get Api key from the http headers
 // Example: Authorization: ApiKey {apikey}
-func GetApiKey(header http.Header) (string, error) {
+func getApiKey(header http.Header) (string, error) {
 	val := header.Get("Authorization")
 	if val == "" {
 		return "", errors.New("no authorization info found")

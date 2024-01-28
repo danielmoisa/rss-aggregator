@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/danielmoisa/rss-aggregator/internal/api"
 	"github.com/danielmoisa/rss-aggregator/internal/database"
-	"github.com/danielmoisa/rss-aggregator/internal/handlers"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
@@ -33,7 +33,7 @@ func main() {
 		log.Fatal("Can't connect to database")
 	}
 
-	apiConfig := handlers.ApiConfig{
+	apiConfig := api.ApiConfig{
 		DB: database.New(conn),
 	}
 
@@ -59,9 +59,9 @@ func main() {
 
 	// Api routes
 	v1Router := chi.NewRouter()
-	v1Router.Get("/health", handlers.HandlerReadiness)
+	v1Router.Get("/health", api.HandlerReadiness)
 	v1Router.Post("/users", apiConfig.CreateUser)
-	v1Router.Get("/users", apiConfig.GetUserByApiKey)
+	v1Router.Get("/users", apiConfig.AuthMiddleware(apiConfig.GetUserByApiKey))
 
 	router.Mount("/v1", v1Router)
 
