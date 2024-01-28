@@ -60,8 +60,10 @@ func main() {
 	// Api routes
 	v1Router := chi.NewRouter()
 	v1Router.Get("/health", api.HandlerReadiness)
-	v1Router.Post("/users", apiConfig.CreateUser)
-	v1Router.Get("/users", apiConfig.AuthMiddleware(apiConfig.GetUserByApiKey))
+	v1Router.Post("/users", apiConfig.CreateUserHandler)
+	v1Router.Get("/users", apiConfig.AuthMiddleware(apiConfig.GetUserHandler))
+	v1Router.Post("/feeds", apiConfig.AuthMiddleware(apiConfig.CreateFeedHandler))
+	v1Router.Get("/feeds", apiConfig.GetFeedsHandler)
 
 	router.Mount("/v1", v1Router)
 
