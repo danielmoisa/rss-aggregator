@@ -33,39 +33,37 @@ func main() {
 		log.Fatal("Can't connect to database")
 	}
 
-	apiConfig := api.ApiConfig{
+	apiCfg := api.ApiConfig{
 		DB: database.New(conn),
 	}
 
-	router := chi.NewRouter()
+	r := chi.NewRouter()
 
 	// Cors
-	router.Use(cors.Handler(cors.Options{
-		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
-		AllowedOrigins: []string{"https://*", "http://*"},
-		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
-		MaxAge:           300, // Maximum value not ignored by any of major browsers
+		MaxAge:           300,
 	}))
 
 	// Init server
 	server := &http.Server{
-		Handler: router,
+		Handler: r,
 		Addr:    ":" + port,
 	}
 
 	// Api routes
-	v1Router := chi.NewRouter()
-	v1Router.Get("/health", api.HandlerReadiness)
-	v1Router.Post("/users", apiConfig.CreateUserHandler)
-	v1Router.Get("/users", apiConfig.AuthMiddleware(apiConfig.GetUserHandler))
-	v1Router.Post("/feeds", apiConfig.AuthMiddleware(apiConfig.CreateFeedHandler))
-	v1Router.Get("/feeds", apiConfig.GetFeedsHandler)
+	v1R := chi.NewRouter()
+	v1R.Get("/health", api.HandlerReadiness)
+	v1R.Post("/users", apiCfg.CreateUserHandler)
+	v1R.Get("/users", apiCfg.AuthMiddleware(apiCfg.GetUserHandler))
+	v1R.Post("/feeds", apiCfg.AuthMiddleware(apiCfg.CreateFeedHandler))
+	v1R.Get("/feeds", apiCfg.GetFeedsHandler)
 
-	router.Mount("/v1", v1Router)
+	r.Mount("/v1", v1R)
 
 	// Start server
 	fmt.Printf("Server listen on http://localhost:%v\n", port)
