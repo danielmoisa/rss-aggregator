@@ -12,7 +12,7 @@ type AuthHandler func(http.ResponseWriter, *http.Request, database.User)
 
 func (apiConfig *ApiConfig) AuthMiddleware(handler AuthHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		apiKey, err := getApiKey(r.Header)
+		apiKey, err := utils.GetApiKey(r.Header)
 		if err != nil {
 			utils.ResponseWithError(w, 403, fmt.Sprintf("Auth error: %v", err))
 			return

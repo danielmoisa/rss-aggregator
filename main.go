@@ -62,6 +62,9 @@ func main() {
 	v1R.Get("/users", apiCfg.AuthMiddleware(apiCfg.GetUserHandler))
 	v1R.Post("/feeds", apiCfg.AuthMiddleware(apiCfg.CreateFeedHandler))
 	v1R.Get("/feeds", apiCfg.GetFeedsHandler)
+	v1R.Post("/feed-follows", apiCfg.AuthMiddleware(apiCfg.CreateFeedFollowsHandler))
+	v1R.Get("/feed-follows", apiCfg.AuthMiddleware(apiCfg.GetFeedsFollowsHandler))
+	v1R.Get("/feed-follows/{feedFollowId}", apiCfg.AuthMiddleware(apiCfg.DeleteFeedsFollowHandler))
 
 	r.Mount("/v1", v1R)
 
