@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/danielmoisa/rss-aggregator/internal/api"
 	"github.com/danielmoisa/rss-aggregator/internal/database"
@@ -36,6 +37,8 @@ func main() {
 	apiCfg := api.ApiConfig{
 		DB: database.New(conn),
 	}
+
+	go api.StartScraper(database.New(conn), 10, time.Minute)
 
 	r := chi.NewRouter()
 
