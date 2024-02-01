@@ -16,3 +16,5 @@
 bin/*
 vendor
 .vscode
+coverage.html
+coverage.out
