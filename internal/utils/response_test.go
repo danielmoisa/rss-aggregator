@@ -26,14 +26,12 @@ func TestResponseWithJSON(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", http.StatusCreated, w.Code)
 	}
 
-	// Check the Content-Type header
 	expectedContentType := "Application/json"
 	actualContentType := w.Header().Get("Content-Type")
 	if actualContentType != expectedContentType {
 		t.Errorf("Expected Content-Type %s, got %s", expectedContentType, actualContentType)
 	}
 
-	// Decode the response body and check its content
 	var responseBody map[string]string
 	err := json.Unmarshal(w.Body.Bytes(), &responseBody)
 	if err != nil {
@@ -49,21 +47,15 @@ func TestResponseWithJSON(t *testing.T) {
 }
 
 func TestResponseWithJSON_MarshalError(t *testing.T) {
-	// Create a mock response writer
 	w := httptest.NewRecorder()
-
-	// Use a failing marshaler
 	payload := &FailingMarshaler{}
 
-	// Call the function directly
 	ResponseWithJSON(w, http.StatusOK, payload)
 
-	// Check the response status code
 	if w.Code != http.StatusInternalServerError {
 		t.Errorf("Expected status code %d, got %d", http.StatusInternalServerError, w.Code)
 	}
 
-	// Check that the response body is empty (or contains an error message)
 	if w.Body.Len() > 0 {
 		t.Errorf("Expected empty response body, got %s", w.Body.String())
 	}
@@ -71,7 +63,7 @@ func TestResponseWithJSON_MarshalError(t *testing.T) {
 
 func TestResponseWithError(t *testing.T) {
 	w := httptest.NewRecorder()
-	ResponseWithError(w, 501, "This test should fail")
+	ResponseWithError(w, 501, "This test should return a 5XX error")
 
 	if w.Code < 500 {
 		t.Errorf("Expected status code %d, got %d", http.StatusCreated, w.Code)
